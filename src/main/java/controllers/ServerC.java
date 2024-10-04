@@ -23,7 +23,7 @@ import server.Server;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-
+import java.util.List;
 
 public class ServerC {
 
@@ -34,18 +34,15 @@ public class ServerC {
     private server.Server server;
     private static VBox staticVBox;
 
-    public void initialize(){
-
+    public void initialize() {
 
         // Configurar el ScrollPane
         scrollS.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollS.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollS.setFitToWidth(true); // Asegúrate de que el contenido se ajuste al ancho
 
-
-
         staticVBox = box;
-        receiveMessage("Sever Starting..");
+        receiveMessage("Server Starting..");
         box.heightProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
@@ -56,36 +53,36 @@ public class ServerC {
         new Thread(() -> {
             try {
                 server = Server.getInstance();
+                server.setController(this); // Aseguramos que el servidor tenga referencia al controlador
                 server.makeSocket();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }).start();
 
-        receiveMessage("Sever Running..");
-        receiveMessage("Waiting for User..");
+        receiveMessage("Server Running..");
+        receiveMessage("Waiting for Users..");
     }
 
     private void sendMsg(String msgToSend) {
-        if (!msgToSend.isEmpty()){
+        if (!msgToSend.isEmpty()) {
             HBox hBox = new HBox();
             hBox.setAlignment(Pos.CENTER_RIGHT);
-            hBox.setPadding(new Insets(5,5,0,10));
+            hBox.setPadding(new Insets(5, 5, 0, 10));
 
             Text text = new Text(msgToSend);
             text.setStyle("-fx-font-size: 14");
             TextFlow textFlow = new TextFlow(text);
 
-//            #0693e3 #37d67a #40bf75
             textFlow.setStyle("-fx-background-color: #a35072; -fx-font-weight: bold; -fx-color: white; -fx-background-radius: 20px");
-            textFlow.setPadding(new Insets(5,10,5,10));
-            text.setFill(Color.color(1,1,1));
+            textFlow.setPadding(new Insets(5, 10, 5, 10));
+            text.setFill(Color.color(1, 1, 1));
 
             hBox.getChildren().add(textFlow);
 
             HBox hBoxTime = new HBox();
             hBoxTime.setAlignment(Pos.CENTER_RIGHT);
-            hBoxTime.setPadding(new Insets(0,5,5,10));
+            hBoxTime.setPadding(new Insets(0, 5, 5, 10));
             String stringTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
             Text time = new Text(stringTime);
             time.setStyle("-fx-font-size: 8");
@@ -97,23 +94,28 @@ public class ServerC {
         }
     }
 
-    public static void receiveMessage(String msgFromClient){
+    public static void receiveMessage(String msgFromClient) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
-        hBox.setPadding(new Insets(5,5,5,10));
+        hBox.setPadding(new Insets(5, 5, 5, 10));
 
         Text text = new Text(msgFromClient);
         TextFlow textFlow = new TextFlow(text);
         textFlow.setStyle("-fx-background-color: #ffa3c4; -fx-font-weight: bold; -fx-background-radius: 20px");
-        textFlow.setPadding(new Insets(5,10,5,10));
-        text.setFill(Color.color(0,0,0));
+        textFlow.setPadding(new Insets(5, 10, 5, 10));
+        text.setFill(Color.color(0, 0, 0));
 
         hBox.getChildren().add(textFlow);
 
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                staticVBox.getChildren().add(hBox);
+        Platform.runLater(() -> staticVBox.getChildren().add(hBox));
+    }
+
+    // Método para actualizar la lista de usuarios conectados
+    public void updateUserList(List<String> users) {
+        Platform.runLater(() -> {
+            box.getChildren().clear(); // Limpiar la caja antes de actualizar la lista de usuarios
+            for (String user : users) {
+                receiveMessage(user + " está conectado.");
             }
         });
     }
@@ -126,12 +128,11 @@ public class ServerC {
             stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("../chat/Login.fxml"))));
         } catch (IOException e) {
             e.printStackTrace();
-            new Alert(Alert.AlertType.ERROR,"something went wrong. can't add client").show();
+            new Alert(Alert.AlertType.ERROR, "error cannot add customer").show();
         }
         stage.setTitle("EChat");
         stage.centerOnScreen();
         stage.setResizable(false);
         stage.show();
     }
-
 }

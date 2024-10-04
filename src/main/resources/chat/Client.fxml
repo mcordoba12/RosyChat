@@ -11,7 +11,7 @@
          <content>
             <VBox fx:id="box" prefHeight="415.0" prefWidth="324.0" style="-fx-background-color: #f2cfd5;" />
          </content></ScrollPane>
-      <Button layoutX="290.0" layoutY="566.0" mnemonicParsing="false" onAction="#sendButtonOnAction" prefHeight="35.0" prefWidth="39.0" style="-fx-background-color: #d99ea4;">
+      <Button layoutX="278.0" layoutY="593.0" mnemonicParsing="false" onAction="#sendButtonOnAction" prefHeight="35.0" prefWidth="39.0" style="-fx-background-color: #d99ea4;">
          <graphic>
             <ImageView fitHeight="39.0" fitWidth="62.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -19,7 +19,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button layoutX="230.0" layoutY="562.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="56.0" style="-fx-background-color: #d99ea4;">
+      <Button layoutX="230.0" layoutY="589.0" mnemonicParsing="false" prefHeight="54.0" prefWidth="56.0" style="-fx-background-color: #d99ea4;">
          <graphic>
             <ImageView fx:id="audio" fitHeight="45.0" fitWidth="39.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -27,17 +27,16 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button layoutX="39.0" layoutY="67.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="72.0" style="-fx-background-color: #d99ea4;" />
       <ImageView fx:id="llamada" fitHeight="46.0" fitWidth="54.0" layoutX="322.0" layoutY="44.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../images/llamada.png" />
          </image>
       </ImageView>
-      <Text fx:id="txtLabel" layoutX="154.0" layoutY="114.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Chat" wrappingWidth="86.99999999999989">
+      <Text fx:id="txtLabel" layoutX="111.0" layoutY="109.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Chat" wrappingWidth="195.00001525878895">
          <font>
             <Font name="Century" size="29.0" />
          </font>
       </Text>
-      <TextField fx:id="txtMsg" layoutX="52.0" layoutY="572.0" onAction="#txtMsgOnAction" prefHeight="35.0" prefWidth="177.0" />
+      <TextField fx:id="txtMsg" layoutX="52.0" layoutY="595.0" onAction="#txtMsgOnAction" prefHeight="35.0" prefWidth="177.0" />
    </children>
 </AnchorPane>

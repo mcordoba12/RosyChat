@@ -1,11 +1,11 @@
 package controllers;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -22,6 +22,9 @@ import java.io.*;
 import java.net.Socket;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List; // Asegúrate de que esta línea esté presente y sea de java.util
+
 
 public class ClientC {
     public AnchorPane pane;
@@ -30,16 +33,34 @@ public class ClientC {
     public TextField txtMsg;
     public Text txtLabel;
 
+    private boolean isPrivateChat;
+    private String selectedRecipient;
+    private ComboBox<String> recipientComboBox;
+
+
+
     private Socket socket;
     private DataInputStream dataInputStream;
     private DataOutputStream dataOutputStream;
     private String clientName = "Client";
+
+
+    private List<String> connectedUserNames = new ArrayList<>();
+
+    // Método para agregar un nuevo usuario a la lista
+    public void addUser(String username) {
+        connectedUserNames.add(username);
+        recipientComboBox.getItems().add(username); // Actualiza el ComboBox para reflejar el nuevo usuario
+    }
+
 
     public void initialize() {
         setupScrollPane();
         txtLabel.setText(clientName);
         connectToServer();
         setupVBoxListener();
+        connectedUserNames.add("Grupo"); // Agregar opción para chat grupal
+        recipientComboBox.getItems().addAll(connectedUserNames);
     }
 
     private void setupScrollPane() {
@@ -58,7 +79,10 @@ public class ClientC {
                 socket = new Socket("localhost", 3001);
                 dataInputStream = new DataInputStream(socket.getInputStream());
                 dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                System.out.println("Client connected");
+                dataOutputStream.writeUTF("setname-" + clientName); // Enviar nombre del cliente
+                dataOutputStream.flush();
+
+                System.out.println("Client logged in");
                 ServerC.receiveMessage(clientName + " joined.");
 
                 while (socket.isConnected()) {
@@ -86,16 +110,29 @@ public class ClientC {
     }
 
     public void sendButtonOnAction(ActionEvent actionEvent) {
-        sendMsg(txtMsg.getText());
+        String msgToSend = txtMsg.getText();
+        String recipient = recipientComboBox.getValue();
+
+        // Si estás en un chat privado, asigna el destinatario
+        if (isPrivateChat) { // Cambia esta condición según tu lógica
+            recipient = selectedRecipient; // Asigna el destinatario seleccionado
+        }
+
+        sendMsg(msgToSend, recipient);
     }
 
-    private void sendMsg(String msgToSend) {
-        if (!msgToSend.isEmpty() && !msgToSend.matches(".*\\.(png|jpe?g|gif)$")) {
+
+    private void sendMsg(String msgToSend, String recipient) {
+        if (!msgToSend.isEmpty()) {
             HBox hBox = createMessageHBox(msgToSend);
             box.getChildren().addAll(hBox, createTimeHBox());
 
             try {
-                dataOutputStream.writeUTF(clientName + "-" + msgToSend);
+                if (recipient != null && !recipient.equals("Grupo")) { // Mensaje privado
+                    dataOutputStream.writeUTF("private-" + recipient + "-" + msgToSend);
+                } else { // Mensaje grupal
+                    dataOutputStream.writeUTF("group-" + msgToSend);
+                }
                 dataOutputStream.flush();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -104,6 +141,8 @@ public class ClientC {
             txtMsg.clear();
         }
     }
+
+
 
     private HBox createMessageHBox(String msgToSend) {
         HBox hBox = new HBox();
@@ -219,13 +258,4 @@ public class ClientC {
         return hBox;
     }
 
-    public void attachedButtonOnAction(ActionEvent actionEvent) {
-        FileDialog dialog = new FileDialog((Frame) null, "Select File to Open");
-        dialog.setMode(FileDialog.LOAD);
-        dialog.setVisible(true);
-        String file = dialog.getDirectory() + dialog.getFile();
-        dialog.dispose();
-        sendImage(file);
-        System.out.println(file + " chosen.");
-    }
 }

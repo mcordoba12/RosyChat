@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="414.0" prefWidth="482.0" style="-fx-background-color: #d99ea4;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ChatTypeSelectionController">
+   <children>
+      <!-- Etiqueta para indicar a los usuarios que seleccionen otros para chatear -->
+      <Text fx:id="titleLabel" layoutX="30.0" layoutY="30.0" text="Usuarios en línea" style="-fx-font-size: 24; -fx-font-family: 'Century'; -fx-fill: #fff;" />
+
+      <!-- ListView para mostrar los usuarios en línea (permitir selección múltiple) -->
+      <ListView fx:id="onlineUsersList" layoutX="30.0" layoutY="70.0" prefHeight="250.0" prefWidth="422.0" style="-fx-background-color: #f2cfd5; -fx-border-color: #f39ac1; -fx-border-width: 2;" />
+
+      <!-- Botón para iniciar chat grupal con usuarios seleccionados -->
+      <Button fx:id="grupal" layoutX="55.0" layoutY="332.0" mnemonicParsing="false" onAction="#handleGroupChat" prefHeight="44.0" prefWidth="152.0" text="Chat grupal" style="-fx-background-color: #f39ac1; -fx-text-fill: white; -fx-font-size: 16; -fx-font-family: 'Century';" />
+
+      <!-- Botón para iniciar chat privado con usuario seleccionado -->
+      <Button fx:id="privado" layoutX="255.0" layoutY="332.0" mnemonicParsing="false" onAction="#handlePrivateChat" prefHeight="44.0" prefWidth="152.0" text="Chat Privado" style="-fx-background-color: #f39ac1; -fx-text-fill: white; -fx-font-size: 16; -fx-font-family: 'Century';" />
+   </children>
+</AnchorPane>

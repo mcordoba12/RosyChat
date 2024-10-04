@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.ChatController" style="-fx-background-color: #d99ea4;">
+    <top>
+        <Text fx:id="txtLabel" text="Chat" wrappingWidth="200" style="-fx-font-size: 29; -fx-font-family: 'Century'; -fx-fill: #000000;" />
+    </top>
+    <left>
+        <ListView fx:id="participantsList" />
+    </left>
+    <center>
+        <TextArea fx:id="chatArea" editable="false" style="-fx-background-color: #f2cfd5;" />
+    </center>
+    <bottom>
+        <HBox spacing="10" alignment="CENTER">
+            <TextField fx:id="messageInput" promptText="Escribe tu mensaje aquí" style="-fx-background-color: #ffffff;"/>
+            <Button fx:id="sendButton" style="-fx-background-color: #d99ea4;" onAction="#sendMessage">
+                <graphic>
+                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <image>
+                            <Image url="@../images/send.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+            <Button fx:id="audioButton" style="-fx-background-color: #d99ea4;">
+                <graphic>
+                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <image>
+                            <Image url="@../images/micro.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+        </HBox>
+    </bottom>
+</BorderPane>
