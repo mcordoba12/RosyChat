@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import server.Server;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -33,6 +34,9 @@ public class ServerC {
 
     private server.Server server;
     private static VBox staticVBox;
+
+    private List<ObjectOutputStream> clientOutputStreams; // Lista para manejar los streams de los clientes
+
 
     public void initialize() {
 
@@ -64,37 +68,9 @@ public class ServerC {
         receiveMessage("Waiting for Users..");
     }
 
-    private void sendMsg(String msgToSend) {
-        if (!msgToSend.isEmpty()) {
-            HBox hBox = new HBox();
-            hBox.setAlignment(Pos.CENTER_RIGHT);
-            hBox.setPadding(new Insets(5, 5, 0, 10));
 
-            Text text = new Text(msgToSend);
-            text.setStyle("-fx-font-size: 14");
-            TextFlow textFlow = new TextFlow(text);
 
-            textFlow.setStyle("-fx-background-color: #a35072; -fx-font-weight: bold; -fx-color: white; -fx-background-radius: 20px");
-            textFlow.setPadding(new Insets(5, 10, 5, 10));
-            text.setFill(Color.color(1, 1, 1));
-
-            hBox.getChildren().add(textFlow);
-
-            HBox hBoxTime = new HBox();
-            hBoxTime.setAlignment(Pos.CENTER_RIGHT);
-            hBoxTime.setPadding(new Insets(0, 5, 5, 10));
-            String stringTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
-            Text time = new Text(stringTime);
-            time.setStyle("-fx-font-size: 8");
-
-            hBoxTime.getChildren().add(time);
-
-            box.getChildren().add(hBox);
-            box.getChildren().add(hBoxTime);
-        }
-    }
-
-    public static void receiveMessage(String msgFromClient) {
+    public void receiveMessage(String msgFromClient) {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER_LEFT);
         hBox.setPadding(new Insets(5, 5, 5, 10));
@@ -109,6 +85,7 @@ public class ServerC {
 
         Platform.runLater(() -> staticVBox.getChildren().add(hBox));
     }
+
 
     // Método para actualizar la lista de usuarios conectados
     public void updateUserList(List<String> users) {
@@ -130,9 +107,20 @@ public class ServerC {
             e.printStackTrace();
             new Alert(Alert.AlertType.ERROR, "error cannot add customer").show();
         }
-        stage.setTitle("EChat");
+        stage.setTitle("RosyChat");
         stage.centerOnScreen();
         stage.setResizable(false);
         stage.show();
     }
+
+    public void displayMessage(String from, String to, String message) {
+        String logMessage = from + " -> " + to + ": " + message; // Formato del mensaje
+        receiveMessage(logMessage); // Muestra el mensaje en la UI
+    }
+
+    public void displayChatStatus(String chatStatus) {
+        receiveMessage(chatStatus); // Muestra el estado del chat en la UI
+    }
+
+
 }

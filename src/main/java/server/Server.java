@@ -12,6 +12,8 @@ public class Server {
     private List<ServerWorker> connectedUsers; // Lista de clientes conectados
     private ServerC controller; // Referencia al controlador de la UI
 
+    private Map<String, List<String>> chatSessions = new HashMap<>(); // Almacena sesiones de chat
+
     private Server() {
         connectedUsers = new ArrayList<>();
     }
@@ -31,7 +33,7 @@ public class Server {
         serverSocket = new ServerSocket(12345); // Puerto del servidor
         while (true) {
             Socket clientSocket = serverSocket.accept();
-            ServerWorker worker = new ServerWorker(this, clientSocket);
+            ServerWorker worker = new ServerWorker(this, clientSocket, connectedUsers);
             connectedUsers.add(worker);
             worker.start();
         }
@@ -58,51 +60,51 @@ public class Server {
             worker.sendUserList(userNames);
         }
     }
-}
 
-class ServerWorker extends Thread {
-    private Server server;
-    private Socket clientSocket;
-    private String clientName;
-
-    public ServerWorker(Server server, Socket clientSocket) {
-        this.server = server;
-        this.clientSocket = clientSocket;
+    public void updateChatSession(String user, List<String> chatUsers) {
+        chatSessions.put(user, chatUsers);
+        broadcastChatStatus(user, chatUsers);
     }
 
-    public String getClientName() {
-        return clientName;
+    private void broadcastChatStatus(String user, List<String> chatUsers) {
+        StringBuilder message = new StringBuilder(" está en chat con: ");
+        for (String chatUser : chatUsers) {
+            message.append(chatUser).append(", ");
+        }
+        // Eliminar la última coma y espacio
+        if (message.length() > 0) {
+            message.setLength(message.length() - 2);
+        }
+        // Mostrar en la interfaz del servidor
+        controller.displayChatStatus(message.toString());
     }
 
-    @Override
-    public void run() {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-             PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true)) {
+    public void startPrivateChat(String sender, String recipient) {
+        List<String> chatUsers = Arrays.asList(sender, recipient);
+        updateChatSession(sender, chatUsers);
+        sendParticipantList(); // Asegúrate de implementar este método
+    }
 
-            writer.println("Ingrese su nombre: ");
-            clientName = reader.readLine();
-            server.broadcastUserList(); // Enviar la lista de usuarios conectados
+    public void startGroupChat(String initiator, List<String> participants) {
+        List<String> chatUsers = new ArrayList<>(participants); // Hacer una copia
+        chatUsers.add(initiator); // Agregar al iniciador
+        updateChatSession(initiator, chatUsers);
+        sendParticipantList(); // Asegúrate de implementar este método
+    }
 
-            String message;
-            while ((message = reader.readLine()) != null) {
-                // Procesar mensajes
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            server.removeWorker(this); // Remover el trabajador cuando el cliente se desconecte
+    private void sendParticipantList() {
+        List<String> userNames = getConnectedUserNames();
+        for (ServerWorker worker : connectedUsers) {
+            worker.sendUserList(userNames); // Envía la lista a cada trabajador
         }
     }
 
-    public void sendUserList(List<String> userList) {
-        PrintWriter writer;
-        try {
-            writer = new PrintWriter(clientSocket.getOutputStream(), true);
-            writer.println(String.join(",", userList)); // Envía la lista de usuarios separados por comas
-        } catch (IOException e) {
-            e.printStackTrace();
+    private List<String> getConnectedUserNames() {
+        List<String> userNames = new ArrayList<>();
+        for (ServerWorker worker : connectedUsers) {
+            userNames.add(worker.getClientName());
         }
+        return userNames;
     }
-
 }
+

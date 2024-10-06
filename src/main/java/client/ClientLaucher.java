@@ -18,11 +18,6 @@ public class ClientLaucher extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("../chat/Client.fxml"));
-        ClientC controller = new ClientC();
-        fxmlLoader.setController(controller);
-        primaryStage.setScene(new Scene(fxmlLoader.load()));
-
         Stage stage = new Stage();
         stage.initModality(Modality.WINDOW_MODAL);
         stage.initOwner(primaryStage.getScene().getWindow());

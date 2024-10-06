@@ -1,43 +1,110 @@
-package controllers;
+    package controllers;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+    import javafx.application.Platform;
+    import javafx.fxml.FXML;
+    import javafx.scene.control.ListView;
+    import javafx.scene.control.SelectionMode;
+    import javafx.scene.control.TextArea;
+    import javafx.scene.control.TextField;
 
-import java.util.List;
+    import java.io.BufferedReader;
+    import java.io.IOException;
+    import java.io.PrintWriter;
+    import java.util.List;
 
-public class ChatController {
-    @FXML
-    private ListView<String> participantsList; // Para mostrar los participantes en el chat
-    @FXML
-    private TextArea chatArea; // Para mostrar el historial del chat
-    @FXML
-    private TextField messageInput; // Para escribir nuevos mensajes
 
-    private List<String> participants; // Lista de participantes del chat
+    public class ChatController {
+        @FXML
+        private ListView<String> participantsList;
+        @FXML
+        private TextArea chatArea;
+        @FXML
+        private TextField messageInput;
 
-    // Método para establecer los participantes del chat
-    public void setParticipants(List<String> participants) {
-        this.participants = participants;
-        updateParticipantsList();
-    }
+        private List<String> participants;
+        private PrintWriter out;
+        private BufferedReader in; // Para recibir mensajes del servidor
+            // Para enviar mensajes al servidor
 
-    // Actualiza la lista de participantes en la interfaz
-    private void updateParticipantsList() {
-        participantsList.getItems().clear();
-        participantsList.getItems().addAll(participants); // Agregar los participantes a la lista
-    }
-
-    // Método para enviar un mensaje (puedes expandirlo según tus necesidades)
-    @FXML
-    private void sendMessage() {
-        String message = messageInput.getText();
-        if (!message.isEmpty()) {
-            // Aquí debes agregar la lógica para enviar el mensaje a través de la red
-            // Por ejemplo, enviar el mensaje a los participantes del chat
-            chatArea.appendText("Yo: " + message + "\n"); // Agrega el mensaje al área de chat
-            messageInput.clear(); // Limpiar el campo de entrada
+        @FXML
+        public void initialize() {
+            // Permitir selección única
+            participantsList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         }
+
+
+        public void setParticipants(List<String> participants) {
+            this.participants = participants;
+            updateParticipantsList();
+        }
+
+        private void updateParticipantsList() {
+            participantsList.getItems().clear();
+            participantsList.getItems().addAll(participants);
+            System.out.println("Participantes actualizados: " + participantsList.getItems());
+        }
+
+
+        public void setInput(BufferedReader in) {
+            this.in = in;
+            startListening(); // Asegúrate de llamar a startListening aquí
+        }
+
+        public void setOutput(PrintWriter out) {
+            this.out = out;
+        }
+
+
+        @FXML
+        private void sendMessage() {
+            System.out.println("Sending message...");
+
+            String message = messageInput.getText();
+            System.out.println("Mensaje: " + message); // Verificar contenido del mensaje
+            System.out.println("out es null: " + (out == null)); // Verificar si out es null
+
+            if (!message.isEmpty() && out != null) {
+                String selectedParticipant = participantsList.getSelectionModel().getSelectedItem();
+                System.out.println("Participante seleccionado: " + selectedParticipant); // Verificar selección
+
+                if (selectedParticipant != null) {
+                    // Enviar mensaje privado
+                    System.out.println("private-" + selectedParticipant + "-" + message);
+                    out.println("private-" + selectedParticipant + "-" + message);
+                } else {
+                    // Enviar mensaje público
+                    out.println(message);
+                }
+                chatArea.appendText("Yo: " + message + "\n");
+                messageInput.clear();
+            }
+        }
+
+
+        public void receiveMessage(String message) {
+            System.out.println("Received message: " + message); // Para depuración
+            Platform.runLater(() -> chatArea.appendText(message + "\n")); // Asegúrate de que `chatArea` esté inicializado
+        }
+
+
+        public void startListening() {
+            System.out.println("Listening..."); // Para depuración
+            new Thread(() -> {
+                try {
+                    String message;
+                    while ((message = in.readLine()) != null) {
+                        System.out.println("Message received from server: " + message); // Agrega esto para verificar qué se recibe
+                        receiveMessage(message); // Asegúrate de que este método se llame
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+
+
+
+
+
+
     }
-}

@@ -5,9 +5,9 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controllers.ChatController" style="-fx-background-color: #d99ea4;">
+<BorderPane style="-fx-background-color: #d99ea4;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="controllers.ChatController">
     <top>
-        <Text fx:id="txtLabel" text="Chat" wrappingWidth="200" style="-fx-font-size: 29; -fx-font-family: 'Century'; -fx-fill: #000000;" />
+        <Text fx:id="txtLabel" style="-fx-font-size: 29; -fx-font-family: 'Century'; -fx-fill: #000000;" text="Chat" wrappingWidth="200" />
     </top>
     <left>
         <ListView fx:id="participantsList" />
@@ -16,20 +16,20 @@
         <TextArea fx:id="chatArea" editable="false" style="-fx-background-color: #f2cfd5;" />
     </center>
     <bottom>
-        <HBox spacing="10" alignment="CENTER">
-            <TextField fx:id="messageInput" promptText="Escribe tu mensaje aquí" style="-fx-background-color: #ffffff;"/>
-            <Button fx:id="sendButton" style="-fx-background-color: #d99ea4;" onAction="#sendMessage">
+        <HBox alignment="CENTER" prefHeight="48.0" prefWidth="726.0" spacing="10">
+            <TextField fx:id="messageInput" prefHeight="24.0" prefWidth="263.0" promptText="Escribe tu mensaje aquí" style="-fx-background-color: #ffffff;" />
+            <Button fx:id="sendButton" onAction="#sendMessage" prefHeight="41.0" prefWidth="41.0" style="-fx-background-color: #d99ea4;">
                 <graphic>
-                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                    <ImageView fitHeight="33.0" fitWidth="34.0" preserveRatio="true">
                         <image>
                             <Image url="@../images/send.png" />
                         </image>
                     </ImageView>
                 </graphic>
             </Button>
-            <Button fx:id="audioButton" style="-fx-background-color: #d99ea4;">
+            <Button fx:id="audioButton" prefHeight="43.0" prefWidth="44.0" style="-fx-background-color: #d99ea4;">
                 <graphic>
-                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                    <ImageView fitHeight="34.0" fitWidth="39.0" preserveRatio="true">
                         <image>
                             <Image url="@../images/micro.png" />
                         </image>

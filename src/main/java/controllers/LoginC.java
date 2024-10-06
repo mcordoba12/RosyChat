@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import server.Server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,9 +48,11 @@ public class LoginC {
 
                 // Obtén el controlador correcto
                 ChatTypeSelectionController controller = fxmlLoader.getController();
+
                 controller.setClientName(username);
                 controller.setSocket(socket, out, in); // Pasa los sockets al controlador
 
+                controller.setServer(Server.getInstance());
                 usuario.clear();
             } catch (IOException e) {
                 new Alert(Alert.AlertType.ERROR, "No se pudo conectar al servidor").show();
