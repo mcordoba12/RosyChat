@@ -98,7 +98,6 @@ public class Server {
             worker.sendUserList(userNames); // Envía la lista a cada trabajador
         }
     }
-
     private List<String> getConnectedUserNames() {
         List<String> userNames = new ArrayList<>();
         for (ServerWorker worker : connectedUsers) {

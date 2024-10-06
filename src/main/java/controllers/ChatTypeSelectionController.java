@@ -103,6 +103,7 @@ public class ChatTypeSelectionController {
         if (selectedUsers.size() > 1) {
             // Iniciar chat grupal en el servidor
             server.startGroupChat(clientName, selectedUsers);
+            System.out.println("Navegando al chat...");
             navigateToChat("../chat/chat.fxml", selectedUsers); // Pasa los usuarios seleccionados al chat grupal
         } else {
             showAlert("Debe seleccionar al menos dos usuarios para iniciar un chat grupal.");
@@ -115,6 +116,7 @@ public class ChatTypeSelectionController {
         if (selectedUser != null) {
             // Iniciar chat privado en el servidor
             server.startPrivateChat(clientName, selectedUser);
+            System.out.println("Navegando al chat...");
             navigateToChat("../chat/chat.fxml", List.of(selectedUser)); // Pasa el usuario seleccionado al chat privado
         } else {
             showAlert("Debe seleccionar un usuario para iniciar un chat privado.");
@@ -128,6 +130,8 @@ public class ChatTypeSelectionController {
             Scene chatScene = new Scene(loader.load());
 
             ChatController chatController = loader.getController();
+            System.out.println("Llamando a setParticipants con: " + participants);
+
             chatController.setParticipants(participants); // Asegúrate de que se pase correctamente
             chatController.setOutput(out); // Pasa PrintWriter
             chatController.setInput(in); // Pasa BufferedReader
@@ -141,13 +145,6 @@ public class ChatTypeSelectionController {
             e.printStackTrace();
         }
     }
-
-
-
-
-
-
-
 
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING);

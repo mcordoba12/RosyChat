@@ -38,9 +38,12 @@ public class ServerWorker extends Thread {
             // Enviar un mensaje de bienvenida pidiendo el nombre
             out.println("Ingrese su nombre: ");
 
-            // Leer el nombre del cliente
             clientName = reader.readLine();
-            server.broadcastUserList(); // Enviar la lista de usuarios conectados
+            setClientName(clientName);
+            System.out.println("Nombre del cliente establecido: " + clientName);
+
+
+            server.broadcastUserList(); // Asegúrate de que esto se llama después de establecer el nombre
 
             String message;
             // Escuchar mensajes del cliente
@@ -60,56 +63,53 @@ public class ServerWorker extends Thread {
     public void sendUserList(List<String> userList) {
         try {
             PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
-            writer.println(String.join(",", userList)); // Envía la lista de usuarios separados por comas
+            writer.println(String.join(",", userList));
+            System.out.println("Lista de usuarios enviada: " + String.join(",", userList)); // Para depuración
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void handleMessage(String msg) throws IOException {
-        String[] parts = msg.split("-", 4); // Cambia a 4 para que coincida con sender, recipient, y message
-        if (parts.length == 4 && parts[0].equals("private")) {
-            String sender = parts[1]; // Suponiendo que `parts[1]` es el emisor
-            String recipient = parts[2]; // Suponiendo que `parts[2]` es el receptor
-            String message = parts[3]; // Suponiendo que `parts[3]` es el mensaje
 
-            // Enviar el mensaje privado
+    private void handleMessage(String msg) throws IOException {
+        String[] parts = msg.split("-", 4);
+        if (parts.length == 4 && parts[0].equals("private")) {
+            String sender = parts[1]; // Emisor
+            String recipient = parts[2]; // Receptor
+            String message = parts[3]; // Mensaje
+
+            // Llama a sendPrivateMessage para manejar el envío
             sendPrivateMessage(sender, recipient, message);
         } else {
             // Mensaje público
             for (ServerWorker clientHandler : clients) {
-                System.out.println("Sending message to: " + clientHandler.clientName); // Verifica a quién se envía el mensaje
                 clientHandler.out.println(msg);
             }
         }
     }
 
-
-
-
-    private void sendPrivateMessage(String sender, String recipient, String message) throws IOException {
-        // Verificar que el destinatario no sea el mismo que el emisor
-        if (sender.equals(recipient)) {
-            System.out.println("No se puede enviar un mensaje a sí mismo.");
-            return; // Salir si son la misma persona
-        }
-
+    private void sendPrivateMessage(String sender, String recipient, String message) {
         // Buscar el destinatario y enviar el mensaje
-        for (ServerWorker clientHandler : clients) {
-            if (clientHandler.clientName.equals(recipient)) {
-                clientHandler.out.println("Privado de " + sender + ": " + message);
-                break; // Salir después de enviar el mensaje
-            }
+        ServerWorker recipientHandler = findClientByName(recipient);
+        if (recipientHandler != null) {
+            recipientHandler.out.println("private-" + sender + ": " + message);
+        } else {
+            System.out.println("Destinatario no encontrado: " + recipient);
         }
     }
-
-
-
 
 
 
     // Método para establecer el nombre del cliente
     public void setClientName(String clientName) {
         this.clientName = clientName;
+    }
+    private ServerWorker findClientByName(String name) {
+        for (ServerWorker client : clients) {
+            if (client.clientName.equals(name)) {
+                return client;
+            }
+        }
+        return null; // Si no se encuentra el cliente
     }
 }
